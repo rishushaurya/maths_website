@@ -4,6 +4,9 @@ import { Redis } from "@upstash/redis";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
+// Key prefix to namespace this project's data in a shared Redis database
+const REDIS_KEY_PREFIX = "brahmagupta:";
+
 // ---- Redis Client (lazy-init, null if not configured) ----
 let redis: Redis | null = null;
 
@@ -56,12 +59,13 @@ export async function readData<T>(filename: string, defaultValue: T): Promise<T>
   const kv = getRedis();
   if (kv) {
     try {
-      const cached = await kv.get<T>(filename);
+      const redisKey = `${REDIS_KEY_PREFIX}${filename}`;
+      const cached = await kv.get<T>(redisKey);
       if (cached !== null && cached !== undefined) return cached;
       
       // Cache miss — seed from local JSON file
       const local = readLocalJSON(filename, defaultValue);
-      try { await kv.set(filename, local); } catch { /* seed failed, OK */ }
+      try { await kv.set(redisKey, local); } catch { /* seed failed, OK */ }
       return local;
     } catch (err) {
       console.error(`[cloud-db] Redis read error for ${filename}:`, err);
@@ -80,7 +84,7 @@ export async function writeData<T>(filename: string, data: T): Promise<boolean> 
   
   if (kv) {
     try {
-      await kv.set(filename, data);
+      await kv.set(`${REDIS_KEY_PREFIX}${filename}`, data);
       kvOk = true;
     } catch (err) {
       console.error(`[cloud-db] Redis write error for ${filename}:`, err);
