@@ -1,0 +1,11 @@
+{
+  "siteTitle": "Brahmagupta Mathematics Club | DSU",
+  "defaultTheme": "gold",
+  "defaultAppearance": "light",
+  "adminEmail": "admin@brahmagupta.club",
+  "facultyHeading": "FACULTY",
+  "studentHeading": "OPERATIONS TEAM",
+  "developerHeading": "DEVELOPERS",
+  "facultyGridCols": 3,
+  "studentGridCols": 4
+}
