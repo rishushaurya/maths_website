@@ -3,6 +3,8 @@ import { PromptingIsAllYouNeed } from "@/components/ui/animated-hero-section";
 import { TestimonialSlider, type Review } from "@/components/ui/testimonial-slider-1";
 import { getSettings } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 const devTeamReviews: Review[] = [
   {
     id: 1,
@@ -61,8 +63,8 @@ const devTeamReviews: Review[] = [
   },
 ];
 
-export default function TeamPage() {
-  const settings = getSettings();
+export default async function TeamPage() {
+  const settings = await getSettings();
   
   return (
     <main className="relative min-h-screen font-mono antialiased overflow-x-hidden transition-colors duration-400 pt-24 sm:pt-32 pb-16 sm:pb-24">

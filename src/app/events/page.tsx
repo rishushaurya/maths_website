@@ -1,6 +1,8 @@
 import { MorphingCardStack } from "@/components/ui/morphing-card-stack";
 import { AnimatedTabs, type Tab } from "@/components/ui/animated-tabs";
 import { getEvents, EventData } from "@/lib/data";
+
+export const dynamic = "force-dynamic";
 import { 
   Infinity as InfinityIcon, Divide, FunctionSquare, Variable, 
   Hexagon, Activity, Network, Cpu, Calendar, MapPin, 
@@ -21,8 +23,8 @@ const getIcon = (name: string) => {
   }
 };
 
-export default function EventsPage() {
-  const allEvents = getEvents();
+export default async function EventsPage() {
+  const allEvents = await getEvents();
   const eventPageEvents = allEvents.filter(e => e.showOnEventPage !== false); // Handle older missing flags too
 
   // Prepare featured tabs (using up to 4 upcoming/ongoing events)

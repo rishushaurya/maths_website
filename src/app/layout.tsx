@@ -24,12 +24,12 @@ export const metadata: Metadata = {
   description: "Department of Engineering Mathematics — Dayananda Sagar University",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = getSettings();
+  const settings = await getSettings();
   const theme = (settings.defaultTheme || 'default') as ColorTheme;
   const appearance = (settings.defaultAppearance || 'dark') as AppearanceMode;
   

@@ -124,11 +124,11 @@ const lectureMedia: MediaItem[] = [
   { id: 'lc-4', type: 'image', src: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop' },
 ];
 
-export default function Home() {
-  const dbGallery = getHomeGallerySections();
-  const dbEvents = getHomeEvents();
-  const dbAbout = getAboutContent();
-  const settings = getSettings();
+export default async function Home() {
+  const dbGallery = await getHomeGallerySections();
+  const dbEvents = await getHomeEvents();
+  const dbAbout = await getAboutContent();
+  const settings = await getSettings();
 
   const dynamicEventCards = dbEvents.length > 0 ? dbEvents.map((e) => ({
     id: e.id,

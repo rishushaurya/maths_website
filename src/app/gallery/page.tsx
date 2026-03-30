@@ -40,9 +40,8 @@ function sectionToMediaItems(section: GallerySection): MediaItem[] {
   }));
 }
 
-export default function GalleryPage() {
-  // Try to load admin-managed gallery data
-  const dbSections = getGallerySections().filter((s) => s.showOnGalleryPage !== false);
+export default async function GalleryPage() {
+  const dbSections = (await getGallerySections()).filter((s) => s.showOnGalleryPage !== false);
   const hasDBData = dbSections.length > 0;
 
   return (

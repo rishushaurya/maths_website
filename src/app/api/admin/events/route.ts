@@ -20,14 +20,14 @@ export interface EventData {
 const FILE = "events.json";
 
 export async function GET() {
-  const data = readData<EventData[]>(FILE, []);
+  const data = await readData<EventData[]>(FILE, []);
   return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const events = readData<EventData[]>(FILE, []);
+    const events = await readData<EventData[]>(FILE, []);
 
     if (body.action === "create") {
       events.push({ ...body.data, id: `e-${Date.now()}` });
@@ -36,17 +36,17 @@ export async function POST(request: Request) {
       if (idx !== -1) events[idx] = { ...events[idx], ...body.data };
     } else if (body.action === "delete") {
       const filtered = events.filter((e) => e.id !== body.id);
-      const ok = writeData(FILE, filtered);
-      if (!ok) return NextResponse.json({ error: "Write failed — read-only filesystem. Run locally to make changes." }, { status: 503 });
+      const ok = await writeData(FILE, filtered);
+      if (!ok) return NextResponse.json({ error: "Write failed" }, { status: 503 });
       return NextResponse.json({ success: true });
     } else if (body.action === "save_all") {
-      const ok = writeData(FILE, body.events);
-      if (!ok) return NextResponse.json({ error: "Write failed — read-only filesystem. Run locally to make changes." }, { status: 503 });
+      const ok = await writeData(FILE, body.events);
+      if (!ok) return NextResponse.json({ error: "Write failed" }, { status: 503 });
       return NextResponse.json({ success: true });
     }
 
-    const ok = writeData(FILE, events);
-    if (!ok) return NextResponse.json({ error: "Write failed — read-only filesystem. Run locally to make changes." }, { status: 503 });
+    const ok = await writeData(FILE, events);
+    if (!ok) return NextResponse.json({ error: "Write failed" }, { status: 503 });
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed" }, { status: 500 });

@@ -1,19 +1,4 @@
-import fs from "fs";
-import path from "path";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-
-function readJSON<T>(filename: string, defaultValue: T): T {
-  try {
-    const filePath = path.join(DATA_DIR, filename);
-    if (fs.existsSync(filePath)) {
-      return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
-    }
-  } catch {
-    // Return default
-  }
-  return defaultValue;
-}
+import { readData } from "@/lib/local-db";
 
 // ---- Gallery ----
 export interface GalleryItem {
@@ -31,12 +16,13 @@ export interface GallerySection {
   items: GalleryItem[];
 }
 
-export function getGallerySections(): GallerySection[] {
-  return readJSON<GallerySection[]>("gallery.json", []);
+export async function getGallerySections(): Promise<GallerySection[]> {
+  return readData<GallerySection[]>("gallery.json", []);
 }
 
-export function getHomeGallerySections(): GallerySection[] {
-  return getGallerySections().filter((s) => s.showOnHome && s.items.length > 0);
+export async function getHomeGallerySections(): Promise<GallerySection[]> {
+  const sections = await getGallerySections();
+  return sections.filter((s) => s.showOnHome && s.items.length > 0);
 }
 
 // ---- Events ----
@@ -54,20 +40,21 @@ export interface EventData {
   
   // Visibility & State
   status: "upcoming" | "ongoing" | "ended";
-  showOnHome: boolean;                 // Controls if it appears in Home Page general list
-  showOnEventPage: boolean;            // Controls if it appears in Events Page list
-  isCountdownEvent: boolean;           // If true, this is the event shown in the Home Page Countdown Hero
+  showOnHome: boolean;
+  showOnEventPage: boolean;
+  isCountdownEvent: boolean;
   
   links: EventLink[];
   downloads: EventDownload[];
 }
 
-export function getEvents(): EventData[] {
-  return readJSON<EventData[]>("events.json", []);
+export async function getEvents(): Promise<EventData[]> {
+  return readData<EventData[]>("events.json", []);
 }
 
-export function getHomeEvents(): EventData[] {
-  return getEvents().filter((e) => e.showOnHome);
+export async function getHomeEvents(): Promise<EventData[]> {
+  const events = await getEvents();
+  return events.filter((e) => e.showOnHome);
 }
 
 // ---- Team ----
@@ -83,20 +70,23 @@ export interface TeamMember {
   affiliation?: string;
 }
 
-export function getTeamMembers(): TeamMember[] {
-  return readJSON<TeamMember[]>("team.json", []);
+export async function getTeamMembers(): Promise<TeamMember[]> {
+  return readData<TeamMember[]>("team.json", []);
 }
 
-export function getFaculty(): TeamMember[] {
-  return getTeamMembers().filter((m) => m.category === "faculty");
+export async function getFaculty(): Promise<TeamMember[]> {
+  const members = await getTeamMembers();
+  return members.filter((m) => m.category === "faculty");
 }
 
-export function getStudents(): TeamMember[] {
-  return getTeamMembers().filter((m) => m.category === "student");
+export async function getStudents(): Promise<TeamMember[]> {
+  const members = await getTeamMembers();
+  return members.filter((m) => m.category === "student");
 }
 
-export function getDevelopers(): TeamMember[] {
-  return getTeamMembers().filter((m) => m.category === "developer");
+export async function getDevelopers(): Promise<TeamMember[]> {
+  const members = await getTeamMembers();
+  return members.filter((m) => m.category === "developer");
 }
 
 // ---- Content ----
@@ -106,22 +96,21 @@ export interface ContentSection {
   paragraphs: string[];
 }
 
-export function getContent(): ContentSection[] {
-  return readJSON<ContentSection[]>("content.json", []);
+export async function getContent(): Promise<ContentSection[]> {
+  return readData<ContentSection[]>("content.json", []);
 }
 
-export function getAboutContent(): ContentSection | null {
-  return getContent().find((s) => s.id === "about") || null;
+export async function getAboutContent(): Promise<ContentSection | null> {
+  const content = await getContent();
+  return content.find((s) => s.id === "about") || null;
 }
 
 // ---- Settings ----
 export interface SiteSettings {
   siteTitle: string;
-  defaultTheme: string;        // 'default', 'sapphire', 'gold', 'emerald', 'rose'
-  defaultAppearance: string;   // 'dark', 'light'
+  defaultTheme: string;
+  defaultAppearance: string;
   adminEmail: string;
-
-  // Global Layout Overrides
   facultyHeading: string;
   studentHeading: string;
   developerHeading: string;
@@ -129,8 +118,8 @@ export interface SiteSettings {
   studentGridCols: number;
 }
 
-export function getSettings(): SiteSettings {
-  return readJSON<SiteSettings>("settings.json", {
+export async function getSettings(): Promise<SiteSettings> {
+  return readData<SiteSettings>("settings.json", {
     siteTitle: "Brahmagupta Mathematics Club | DSU",
     defaultTheme: "default",
     defaultAppearance: "dark",
