@@ -11,6 +11,7 @@ export interface EventData {
   date: string;
   venue: string;
   image: string;
+  images?: string[];
   icon: string;
   showOnHome: boolean;
   links: EventLink[];

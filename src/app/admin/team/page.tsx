@@ -46,12 +46,19 @@ export default function TeamManager() {
   const autoSave = useCallback((updated: TeamMember[]) => {
     setMembers(updated);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => {
-      fetch("/api/admin/team", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_all", members: updated }),
-      });
+    saveTimeout.current = setTimeout(async () => {
+      try {
+          const res = await fetch("/api/admin/team", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "save_all", members: updated }),
+          });
+          if (!res.ok) {
+              alert("Database Error! Failed to save team changes permanently. Please avoid uploading massive base64 images, or check Redis limits.");
+          }
+      } catch {
+          alert("Network Error! Failed to save team changes to the database.");
+      }
     }, 500);
   }, []);
 

@@ -68,6 +68,14 @@ export default async function EventsPage() {
             {event.description}
           </p>
 
+          {event.images && event.images.length > 0 && (
+            <div className="flex gap-2 mt-2 overflow-x-auto pb-2 custom-scroll">
+              {event.images.map((img, i) => (
+                <img key={i} src={img} alt={`Gallery ${i}`} className="h-16 w-16 sm:h-20 sm:w-20 object-cover border opacity-80 hover:opacity-100 transition-opacity flex-shrink-0" style={{ borderColor: 'var(--border)' }} />
+              ))}
+            </div>
+          )}
+
           <div className="flex flex-col gap-2 mt-4 font-mono text-xs tracking-wider" style={{ color: 'var(--text-muted)' }}>
             {event.date && (
               <div className="flex items-center gap-2">

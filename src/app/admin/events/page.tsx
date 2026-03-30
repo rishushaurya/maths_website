@@ -15,6 +15,7 @@ interface EventData {
   date: string;
   venue: string;
   image: string;
+  images?: string[];
   icon: string;
   status: "upcoming" | "ongoing" | "ended";
   showOnHome: boolean;
@@ -34,6 +35,7 @@ export default function EventsManager() {
   const [form, setForm] = useState<Partial<EventData>>({});
   const [loading, setLoading] = useState(true);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<"cover" | "gallery">("cover");
 
   // Load from API
   useEffect(() => {
@@ -48,18 +50,25 @@ export default function EventsManager() {
   const autoSave = useCallback((updated: EventData[]) => {
     setEvents(updated);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    saveTimeout.current = setTimeout(() => {
-      fetch("/api/admin/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_all", events: updated }),
-      });
+    saveTimeout.current = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/admin/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "save_all", events: updated }),
+        });
+        if (!res.ok) {
+            alert("Database Error! Failed to save changes permanently. Please avoid uploading massive base64 images, or check Redis limits.");
+        }
+      } catch {
+        alert("Network Error! Failed to save changes to the database.");
+      }
     }, 500);
   }, []);
 
   const startNew = () => {
     setForm({ 
-      title: "", description: "", date: "", venue: "", image: "", icon: "Infinity", 
+      title: "", description: "", date: "", venue: "", image: "", images: [], icon: "Infinity", 
       status: "upcoming", showOnHome: false, showOnEventPage: true, isCountdownEvent: false, 
       links: [], downloads: [] 
     });
@@ -89,6 +98,7 @@ export default function EventsManager() {
       const newEvent: EventData = {
         id: `e-${Date.now()}`, title: form.title || "", description: form.description || "",
         date: form.date || "", venue: form.venue || "", image: form.image || "",
+        images: form.images || [],
         icon: form.icon || "Infinity", 
         status: form.status || "upcoming",
         showOnHome: form.showOnHome || false, 
@@ -128,6 +138,7 @@ export default function EventsManager() {
   };
   const removeLink = (idx: number) => setForm({ ...form, links: (form.links || []).filter((_, i) => i !== idx) });
   const removeDownload = (idx: number) => setForm({ ...form, downloads: (form.downloads || []).filter((_, i) => i !== idx) });
+  const removeGalleryImage = (idx: number) => setForm({ ...form, images: (form.images || []).filter((_, i) => i !== idx) });
 
   const renderForm = () => (
     <div className="space-y-4 p-4 border" style={{ borderColor: "var(--accent)", backgroundColor: "var(--bg-surface)" }}>
@@ -173,7 +184,7 @@ export default function EventsManager() {
             style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} placeholder="https://..." />
             <button 
                 type="button"
-                onClick={() => setShowMediaPicker(true)}
+                onClick={() => { setMediaPickerTarget("cover"); setShowMediaPicker(true); }}
                 className="px-3 py-2 text-[10px] tracking-wider uppercase border whitespace-nowrap cursor-pointer flex items-center gap-1.5"
                 style={{ borderColor: "var(--border)", color: "var(--text-primary)", backgroundColor: "var(--bg-secondary)" }}>
                 <ImageIcon className="w-3 h-3" /> Browse Library
@@ -182,6 +193,28 @@ export default function EventsManager() {
         {form.image && (
           <div className="mt-2 text-xs font-mono">
             <img src={form.image} alt="Preview" className="w-32 h-16 object-cover border" style={{borderColor: "var(--border)"}}/>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+            <label className="block text-[10px] tracking-[0.2em] uppercase" style={{ color: "var(--text-muted)" }}>Event Gallery Images</label>
+            <button type="button" onClick={() => { setMediaPickerTarget("gallery"); setShowMediaPicker(true); }}
+                className="text-[10px] flex items-center gap-1 cursor-pointer" style={{ color: "var(--accent)" }}>
+                <ImageIcon className="w-3 h-3" /> Add Image
+            </button>
+        </div>
+        {form.images && form.images.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {form.images.map((img, i) => (
+               <div key={i} className="relative w-20 h-20 border group" style={{ borderColor: 'var(--border)' }}>
+                 <img src={img} alt="" className="w-full h-full object-cover" />
+                 <button onClick={() => removeGalleryImage(i)} type="button" className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    <X className="w-3 h-3" />
+                 </button>
+               </div>
+            ))}
           </div>
         )}
       </div>
@@ -269,7 +302,14 @@ export default function EventsManager() {
       <MediaPicker 
         isOpen={showMediaPicker} 
         onClose={() => setShowMediaPicker(false)} 
-        onSelect={(file) => { setForm({ ...form, image: file.url }); setShowMediaPicker(false); }}
+        onSelect={(file) => { 
+            if (mediaPickerTarget === "cover") {
+                setForm({ ...form, image: file.url }); 
+            } else {
+                setForm({ ...form, images: [...(form.images || []), file.url] });
+            }
+            setShowMediaPicker(false); 
+        }}
         typeFilter="image"
       />
 
@@ -297,8 +337,9 @@ export default function EventsManager() {
           <motion.div key={event.id} className="border" style={{ borderColor: editingId === event.id ? "var(--accent)" : "var(--border)" }} layout>
             <div className="flex items-center justify-between px-4 py-3 cursor-pointer" onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 border overflow-hidden shrink-0" style={{ borderColor: "var(--border)" }}>
+                <div className="w-10 h-10 border overflow-hidden shrink-0 relative" style={{ borderColor: "var(--border)" }}>
                   {event.image && <img src={event.image} alt="" className="w-full h-full object-cover" />}
+                  {event.images && event.images.length > 0 && <span className="absolute bottom-0 right-0 bg-black/70 text-white text-[8px] px-1 font-mono">+{event.images.length}</span>}
                 </div>
                 <div>
                   <h3 className="text-sm font-bold tracking-wider uppercase" style={{ color: "var(--text-primary)" }}>{event.title}</h3>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Film, ImageIcon, Loader2, Upload, FolderOpen } from "lucide-react";
+import { X, Film, ImageIcon, Loader2, Upload, FolderOpen, Link } from "lucide-react";
 
 interface MediaFile {
   name: string;
@@ -61,11 +61,14 @@ export function MediaPicker({ isOpen, onClose, onSelect, typeFilter = "all" }: M
 
     try {
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         await fetchMedia(); // Reload
+      } else {
+        alert(data.error || "Upload failed. If on Vercel, the filesystem is read-only.");
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      alert("Network error: Upload failed.");
     }
     setUploading(false);
     
@@ -100,6 +103,14 @@ export function MediaPicker({ isOpen, onClose, onSelect, typeFilter = "all" }: M
                 <button onClick={handleUploadClick} disabled={uploading} className="flex items-center gap-2 px-3 py-1.5 text-xs uppercase tracking-wider disabled:opacity-50 cursor-pointer" style={{ backgroundColor: "var(--accent)", color: "var(--bg-primary)" }}>
                   {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                   {uploading ? "Uploading..." : "Upload New"}
+                </button>
+                <button onClick={() => {
+                  const url = prompt("Enter an external image or video URL (e.g. Imgur, YouTube thumbnail):");
+                  if (url) {
+                    onSelect({ name: url.split('/').pop() || "External Link", url, folder: "external", type: typeFilter === "video" ? "video" : "image", size: 0, createdAt: Date.now() });
+                  }
+                }} className="flex items-center gap-2 px-3 py-1.5 text-xs uppercase tracking-wider border cursor-pointer hover:border-[var(--accent)]" style={{ borderColor: 'var(--border)', color: "var(--text-primary)" }}>
+                  <Link className="w-3.5 h-3.5" /> URL
                 </button>
                 <button onClick={onClose} className="p-1 hover:bg-black/10 rounded cursor-pointer" style={{ color: "var(--text-muted)" }}>
                   <X className="w-5 h-5" />
