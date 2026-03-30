@@ -17,7 +17,7 @@ const FILE = "settings.json";
 const DEFAULTS: SiteSettings = {
   siteTitle: "Brahmagupta Mathematics Club | DSU",
   defaultTheme: "default",
-  defaultAppearance: "dark",
+  defaultAppearance: "light",
   adminEmail: "admin@brahmagupta.club",
   facultyHeading: "FACULTY",
   studentHeading: "OPERATIONS TEAM",

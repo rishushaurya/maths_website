@@ -15,13 +15,13 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  appearance: 'dark',
+  appearance: 'light',
   colorTheme: 'default',
   toggleAppearance: () => {},
   setColorTheme: () => {},
   resetToDefault: () => {},
   adminDefaultTheme: 'default',
-  adminDefaultAppearance: 'dark',
+  adminDefaultAppearance: 'light',
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -31,7 +31,7 @@ const STORAGE_KEY_APPEARANCE = 'user-appearance';
 
 export function ThemeProvider({ 
   children,
-  initialAppearance = 'dark',
+  initialAppearance = 'light',
   initialColorTheme = 'default'
 }: { 
   children: React.ReactNode;

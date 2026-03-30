@@ -122,7 +122,7 @@ export async function getSettings(): Promise<SiteSettings> {
   return readData<SiteSettings>("settings.json", {
     siteTitle: "Brahmagupta Mathematics Club | DSU",
     defaultTheme: "default",
-    defaultAppearance: "dark",
+    defaultAppearance: "light",
     adminEmail: "admin@brahmagupta.club",
     facultyHeading: "FACULTY",
     studentHeading: "OPERATIONS TEAM",

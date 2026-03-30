@@ -2,12 +2,115 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { GripHorizontal, RefreshCcw, Palette, X, Menu } from "lucide-react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ThemeSwitch } from "./theme-switch-button";
 import { useTheme, type ColorTheme } from "@/lib/theme-context";
+
+// Types
+interface GlassEffectProps {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+// Global SVG Filter Component
+const GlassFilter: React.FC = () => (
+  <svg style={{ display: "none" }}>
+    <filter
+      id="glass-distortion"
+      x="0%"
+      y="0%"
+      width="100%"
+      height="100%"
+      filterUnits="objectBoundingBox"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.001 0.005"
+        numOctaves="1"
+        seed="17"
+        result="turbulence"
+      />
+      <feComponentTransfer in="turbulence" result="mapped">
+        <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+        <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+        <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+      </feComponentTransfer>
+      <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+      <feSpecularLighting
+        in="softMap"
+        surfaceScale="5"
+        specularConstant="1"
+        specularExponent="100"
+        lightingColor="white"
+        result="specLight"
+      >
+        <fePointLight x="-200" y="-200" z="300" />
+      </feSpecularLighting>
+      <feComposite
+        in="specLight"
+        operator="arithmetic"
+        k1="0"
+        k2="1"
+        k3="1"
+        k4="0"
+        result="litImage"
+      />
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="softMap"
+        scale="100"
+        xChannelSelector="R"
+        yChannelSelector="G"
+      />
+    </filter>
+  </svg>
+);
+
+// Glass Effect Wrapper Component
+const GlassEffect: React.FC<GlassEffectProps> = ({
+  children,
+  className = "",
+  style = {},
+}) => {
+  const glassStyle = {
+    boxShadow: "0 6px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 255, 255, 0.05)",
+    transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)",
+    background: "var(--nav-bg)",
+    ...style,
+  };
+
+  return (
+    <div
+      className={`relative flex items-center justify-center font-semibold overflow-hidden transition-all duration-700 ${className}`}
+      style={glassStyle}
+    >
+      <div
+        className="absolute inset-0 z-0 overflow-hidden rounded-inherit"
+        style={{
+          backdropFilter: "blur(6px)",
+          filter: "url(#glass-distortion)",
+          isolation: "isolate",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-10 rounded-inherit"
+        style={{ background: "var(--bg-surface)" }}
+      />
+      <div
+        className="absolute inset-0 z-20 rounded-inherit overflow-hidden"
+        style={{
+          boxShadow:
+            "inset 1px 1px 2px 0 rgba(255, 255, 255, 0.15), inset -1px -1px 2px 0 rgba(0, 0, 0, 0.5)",
+        }}
+      />
+      <div className="relative z-30 flex items-center">{children}</div>
+    </div>
+  );
+};
 
 // Theme color swatches
 const themeSwatches: { id: ColorTheme; label: string; color: string; gradient: string }[] = [
@@ -27,42 +130,18 @@ const navItems = [
   { name: "GALLERY", href: "/gallery" },
 ];
 
-// Original Glass effect wrapper
-const GlassEffect = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <div
-    className={`flex items-center rounded-[2rem] backdrop-blur-xl shadow-lg ${className}`}
-    style={{ background: "var(--nav-bg)", border: "1px solid var(--border)" }}
-  >
-    {children}
-  </div>
-);
-
-// SVG filter
-const GlassFilter: React.FC = () => (
-  <svg style={{ display: "none" }}>
-    <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
-      <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence" />
-      <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
-      <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
-        <fePointLight x="-200" y="-200" z="300" />
-      </feSpecularLighting>
-      <feDisplacementMap in="SourceGraphic" in2="softMap" scale="100" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </svg>
-);
-
 export const LiquidGlassNav = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const { colorTheme, setColorTheme, appearance, toggleAppearance, resetToDefault } = useTheme();
 
-  // Nav customization (Scale, Gap, Layout)
+  // Customizability States
+  const [showOptions, setShowOptions] = useState(false);
   const [navScale, setNavScale] = useState(0);
   const [navGap, setNavGap] = useState(0);
   const [navFlexMode, setNavFlexMode] = useState<"row" | "column">("row");
 
-  const [showOptions, setShowOptions] = useState(false);
+  // Mobile menu
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isColumn = navFlexMode === "column";
@@ -95,71 +174,90 @@ export const LiquidGlassNav = () => {
       <GlassFilter />
 
       {/* ===== DESKTOP NAV ===== */}
-      <div className={`fixed z-50 top-0 left-0 right-0 hidden md:flex flex-col items-center transition-all duration-500 ${isScrolled ? "py-3" : "py-5"}`}>
-        <GlassEffect className="px-2 py-2">
-          <LayoutGroup>
-            <motion.nav
-              layout
-              className={`flex items-center ${isColumn ? "flex-col" : ""}`}
-              style={{ gap: `${4 + navGap * 0.2}px` }}
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            >
-              {/* Logo */}
-              <motion.div layout>
-                <Link href="/" className="flex items-center justify-center" style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}>
-                  <Image src="/logo.png" alt="Brahmagupta" width={38} height={38} className="rounded-full object-contain" />
-                </Link>
-              </motion.div>
+      <div
+        className={`fixed z-50 transition-all duration-500 hidden md:flex ${
+          isColumn
+            ? "top-0 left-0 bottom-0 flex-col items-start py-6 pl-4"
+            : `top-0 left-0 right-0 flex-col items-center ${isScrolled ? "py-4" : "py-6"}`
+        }`}
+      >
+        <GlassEffect className={`${isColumn ? "rounded-2xl px-3 py-4" : "rounded-[2rem] px-2 py-2"}`}>
+          <motion.nav
+            className={`flex items-center ${isColumn ? "flex-col" : ""}`}
+            animate={{
+              gap: navGap ? `${navGap}px` : "4px",
+            }}
+            transition={{ duration: 0.35 }}
+          >
+            {/* Logo */}
+            <motion.div layout className={`flex items-center justify-center ${isColumn ? "mb-2" : "mr-1"}`}>
+              <Link href="/" className="flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="Brahmagupta Mathematics Club"
+                  width={40}
+                  height={40}
+                  className="rounded-full object-contain transition-all duration-300"
+                  style={{ width: `${40 + (navScale * 0.4)}px`, height: `${40 + (navScale * 0.4)}px` }}
+                />
+              </Link>
+            </motion.div>
 
-              {/* Separator */}
-              <motion.div layout
-                className={`bg-[var(--border)] transition-all ${isColumn ? "h-px w-16 my-1" : "w-px h-6 mx-1"}`}
-              />
+            {/* Separator */}
+            <motion.div layout
+              className={`bg-[var(--border)] transition-all ${isColumn ? "h-px w-16 my-1" : "w-px h-6 mx-1"}`}
+            />
 
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <motion.div key={item.href} layout style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}>
-                    <Link
-                      href={item.href}
-                      className={`relative font-medium transition-colors duration-300 rounded-full flex items-center justify-center whitespace-nowrap px-4 py-2.5 text-[0.85rem] tracking-[0.1em] ${
-                        isActive
-                          ? "text-[var(--text-primary)]"
-                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]"
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <motion.div layout key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`relative font-medium transition-colors duration-300 rounded-full flex items-center justify-center whitespace-nowrap
+                      ${isActive
+                        ? "text-[var(--text-primary)]"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]"
                       }`}
-                    >
-                      {isActive && <div className="absolute inset-0 rounded-full blur-md -z-10" style={{ background: 'var(--accent-glow)' }} />}
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                );
-              })}
+                    style={{
+                      fontSize: `${0.85 + (navScale * 0.005)}rem`,
+                      padding: `${0.6 + (navScale * 0.01)}rem ${1.0 + (navScale * 0.015)}rem`,
+                      letterSpacing: '0.1em'
+                    }}
+                  >
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-full blur-md -z-10" style={{ background: 'var(--accent-glow)' }} />
+                    )}
+                    {item.name}
+                  </Link>
+                </motion.div>
+              );
+            })}
 
-              {/* Separator */}
-              <motion.div layout
-                className={`bg-[var(--border)] transition-all ${isColumn ? "h-px w-16 my-1" : "w-px h-6 mx-1"}`}
-              />
+            {/* Separator */}
+            <motion.div layout
+              className={`bg-[var(--border)] transition-all ${isColumn ? "h-px w-16 my-1" : "w-px h-6 mx-1"}`}
+            />
 
-              <motion.div layout className={`flex items-center gap-2 ${isColumn ? "flex-col" : ""}`}>
-                {/* Dark/Light mode switch */}
-                <div style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}>
-                  <ThemeSwitch className="size-8" />
-                </div>
+            <motion.div layout className={`flex items-center gap-2 ${isColumn ? "flex-col" : ""}`}>
+              {/* Dark/Light mode switch */}
+              <div style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}>
+                <ThemeSwitch className="size-8" />
+              </div>
 
-                {/* The "6 Dots" Toggle Button for Options */}
-                <button
-                  onClick={() => setShowOptions(!showOptions)}
-                  className="text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] rounded-full p-2 transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer"
-                  style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}
-                >
-                  <GripHorizontal className="size-5" />
-                </button>
-              </motion.div>
-            </motion.nav>
-          </LayoutGroup>
+              {/* The "6 Dots" Toggle Button for Options */}
+              <button
+                onClick={() => setShowOptions(!showOptions)}
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] rounded-full p-2 transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer"
+                style={{ transform: `scale(${1 + (navScale * 0.01)})`, transformOrigin: 'center' }}
+              >
+                <GripHorizontal className="size-5" />
+              </button>
+            </motion.div>
+          </motion.nav>
         </GlassEffect>
 
-        {/* Desktop Options Panel — Restored with Scale, Gap, Layout + Themes */}
+        {/* The Options Panel Dropdown */}
         <AnimatePresence>
           {showOptions && (
             <motion.div
@@ -179,21 +277,24 @@ export const LiquidGlassNav = () => {
                   <span className="size-4 opacity-50"><GripHorizontal className="size-4" /></span>
                   <span className="text-sm font-mono tracking-widest uppercase">Options</span>
                 </div>
-                <button
-                  onClick={() => {
-                    setNavScale(0);
-                    setNavGap(0);
-                    setNavFlexMode("row");
-                    resetToDefault();
-                  }}
-                  className="group flex cursor-pointer items-center justify-center gap-2 rounded-lg px-2 py-1 text-xs hover:bg-[var(--bg-surface-hover)] transition-all w-full text-right"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  RESET
-                  <span className="cursor-pointer transition-all duration-300 group-hover:rotate-90">
-                    <RefreshCcw className="size-3" />
-                  </span>
-                </button>
+
+                <p>
+                  <button
+                    onClick={() => {
+                      setNavScale(0);
+                      setNavGap(0);
+                      setNavFlexMode("row");
+                      resetToDefault();
+                    }}
+                    className="group flex cursor-pointer items-center justify-center gap-2 rounded-lg px-2 py-1 text-xs hover:bg-[var(--bg-surface-hover)] transition-all w-full text-right"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    RESET
+                    <span className="cursor-pointer transition-all duration-300 group-hover:rotate-90">
+                      <RefreshCcw className="size-3" />
+                    </span>
+                  </button>
+                </p>
               </div>
 
               <div className="flex flex-col gap-3 font-mono text-xs">
