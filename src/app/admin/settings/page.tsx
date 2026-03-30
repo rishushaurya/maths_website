@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Save, Shield, Key, Loader2 } from "lucide-react";
+import { Save, Shield, Key, Loader2, AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [siteTitle, setSiteTitle] = useState("Brahmagupta Mathematics Club | DSU");
   const [defaultTheme, setDefaultTheme] = useState("default");
   const [defaultAppearance, setDefaultAppearance] = useState("dark");
@@ -20,6 +22,7 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [loading, setLoading] = useState(true);
   const [pwMsg, setPwMsg] = useState("");
 
@@ -43,8 +46,9 @@ export default function SettingsPage() {
 
   const handleSaveSettings = async () => {
     setSaving(true);
+    setSaveError("");
     try {
-      await fetch("/api/admin/settings", {
+      const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -53,10 +57,28 @@ export default function SettingsPage() {
           facultyGridCols, studentGridCols
         }),
       });
+      
+      if (res.status === 503) {
+        setSaveError("⚠ Read-only filesystem (Vercel). Changes cannot be saved in production. Run locally to make permanent admin changes, then push to GitHub.");
+        setSaving(false);
+        return;
+      }
+      
+      if (!res.ok) {
+        setSaveError("Failed to save settings.");
+        setSaving(false);
+        return;
+      }
+      
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 3000);
+      
+      // Refresh server components so they re-read settings.json
+      // This does NOT trigger the MathLoader since sessionStorage already has "app-loaded"
+      router.refresh();
+      
     } catch {
-      // Error saving
+      setSaveError("Network error — could not save.");
     }
     setSaving(false);
   };
@@ -131,9 +153,9 @@ export default function SettingsPage() {
           </div>
         </div>
         
-        {/* Layout & Typogaphy Settings */}
+        {/* Layout & Typography Settings */}
         <h2 className="text-sm font-bold tracking-wider uppercase mt-6 pt-6 border-t" style={{ color: "var(--text-primary)", borderColor: "var(--border)" }}>
-          Section Settings & Grid Layout
+          Section Settings &amp; Grid Layout
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -173,11 +195,25 @@ export default function SettingsPage() {
               style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} />
         </div>
 
+        {/* Save Error Message */}
+        {saveError && (
+          <div className="flex items-start gap-2 px-4 py-3 border text-xs font-mono" style={{ borderColor: "#f59e0b30", color: "#f59e0b", backgroundColor: "#f59e0b10" }}>
+            <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span>{saveError}</span>
+          </div>
+        )}
+
         <button onClick={handleSaveSettings} disabled={saving}
           className="flex items-center gap-2 px-4 py-2 text-xs tracking-wider uppercase cursor-pointer disabled:opacity-50"
           style={{ backgroundColor: saved ? "#10b981" : "var(--accent)", color: "var(--bg-primary)" }}>
-          {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</> : saved ? "✓ Saved" : <><Save className="w-3.5 h-3.5" /> Save Settings</>}
+          {saving ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</> : saved ? "✓ Saved — Changes Applied" : <><Save className="w-3.5 h-3.5" /> Save Settings</>}
         </button>
+        
+        {saved && (
+          <p className="text-xs font-mono" style={{ color: "#10b981" }}>
+            ✓ Settings saved to server. Changes are now live across the site.
+          </p>
+        )}
       </div>
 
       {/* Change Password */}
@@ -226,6 +262,7 @@ export default function SettingsPage() {
           <li>• All authentication tokens are stored in httpOnly cookies (immune to XSS)</li>
           <li>• Failed login attempts are rate-limited with deliberate delays</li>
           <li>• All admin routes are protected by JWT middleware verification</li>
+          <li>• On Vercel (production), filesystem writes are read-only. Make admin changes locally and push to GitHub.</li>
         </ul>
       </div>
     </div>
