@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Plus, Trash2, Eye, EyeOff, GripVertical, X, Check, FolderOpen, Film, ImageIcon, Loader2 } from "lucide-react";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 interface MediaFile {
   id: string;
@@ -30,6 +31,7 @@ export default function GalleryManager() {
   const [uploadTarget, setUploadTarget] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   // Load data from API
   useEffect(() => {
@@ -101,6 +103,23 @@ export default function GalleryManager() {
     fileInputRef.current?.click();
   };
 
+  const handleLibraryClick = (sectionId: string) => {
+    setUploadTarget(sectionId);
+    setShowMediaPicker(true);
+  };
+
+  const handlePickerSelect = (file: { url: string; type: string; name: string }) => {
+    if (!uploadTarget) return;
+    const newItem: MediaFile = {
+      id: `media-${Date.now()}`,
+      type: file.type as "image" | "video",
+      url: file.url,
+      name: file.name
+    };
+    autoSave(sections.map((s) => s.id === uploadTarget ? { ...s, items: [...s.items, newItem] } : s));
+    setShowMediaPicker(false);
+  };
+
   const handleFiles = async (files: FileList | null, sectionId: string) => {
     if (!files || files.length === 0) return;
     setUploading(true);
@@ -145,6 +164,13 @@ export default function GalleryManager() {
 
   return (
     <div className="space-y-6">
+      <MediaPicker 
+        isOpen={showMediaPicker} 
+        onClose={() => setShowMediaPicker(false)} 
+        onSelect={handlePickerSelect}
+        typeFilter="all"
+      />
+
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-[0.2em] uppercase" style={{ color: "var(--text-primary)" }}>
@@ -275,11 +301,11 @@ export default function GalleryManager() {
                   Gallery
                 </button>
                 <button
-                  onClick={() => handleUploadClick(section.id)}
+                  onClick={() => handleLibraryClick(section.id)}
                   className="flex items-center gap-1.5 px-2 py-1 text-[10px] tracking-wider uppercase border transition-colors hover:border-[var(--accent)] cursor-pointer"
                   style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                 >
-                  <Upload className="w-3 h-3" /> Upload
+                  <Plus className="w-3 h-3" /> Add Media
                 </button>
                 <button
                   onClick={() => deleteSection(section.id)}
@@ -300,16 +326,16 @@ export default function GalleryManager() {
             >
               {section.items.length === 0 ? (
                 <div
-                  className="flex flex-col items-center justify-center py-12 border border-dashed cursor-pointer"
+                  className="flex flex-col items-center justify-center py-12 border border-dashed cursor-pointer hover:bg-[var(--bg-surface-hover)] transition-colors"
                   style={{ borderColor: "var(--border)" }}
-                  onClick={() => handleUploadClick(section.id)}
+                  onClick={() => handleLibraryClick(section.id)}
                 >
-                  <Upload className="w-8 h-8 mb-3" style={{ color: "var(--text-muted)" }} />
-                  <p className="text-xs tracking-wider" style={{ color: "var(--text-muted)" }}>
-                    Drag & drop files or click to upload
+                  <FolderOpen className="w-8 h-8 mb-3" style={{ color: "var(--accent)" }} />
+                  <p className="text-xs tracking-wider uppercase font-bold" style={{ color: "var(--text-primary)" }}>
+                    Add Media from Library
                   </p>
                   <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>
-                    Supports images (JPG, PNG, WebP) and videos (MP4, MOV)
+                    Click to browse your uploaded files or upload new ones
                   </p>
                 </div>
               ) : (
@@ -348,7 +374,7 @@ export default function GalleryManager() {
                   ))}
                   {/* Add more button */}
                   <button
-                    onClick={() => handleUploadClick(section.id)}
+                    onClick={() => handleLibraryClick(section.id)}
                     className="aspect-square border border-dashed flex items-center justify-center transition-colors hover:bg-[var(--bg-surface-hover)] cursor-pointer"
                     style={{ borderColor: "var(--border)" }}
                   >

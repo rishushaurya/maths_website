@@ -1,9 +1,16 @@
 import { FacultyGrid, TeamGrid } from "@/components/ui/faculty-grid";
 import { PromptingIsAllYouNeed } from "@/components/ui/animated-hero-section";
 import { TestimonialSlider, type Review } from "@/components/ui/testimonial-slider-1";
-import { getSettings } from "@/lib/data";
+import { getSettings, getStudents } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+
+const fallbackStudents = [
+  { name: "Ramanujan Kumar", role: "Tech Lead", affiliation: "Algorithms & Competitive Programming", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop", id: "s1" },
+  { name: "Emmy Singh", role: "Design Lead", affiliation: "UI/UX & Interactive Media", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop", id: "s2" },
+  { name: "Alan Turing", role: "Event Coordinator", affiliation: "Logistics & Outreach", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop", id: "s3" },
+  { name: "Ada Lovelace", role: "Content Writer", affiliation: "Publications & Blogs", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop", id: "s4" },
+];
 
 const devTeamReviews: Review[] = [
   {
@@ -65,6 +72,8 @@ const devTeamReviews: Review[] = [
 
 export default async function TeamPage() {
   const settings = await getSettings();
+  const dbStudents = await getStudents();
+  const displayStudents = dbStudents.length > 0 ? dbStudents : fallbackStudents;
   
   return (
     <main className="relative min-h-screen font-mono antialiased overflow-x-hidden transition-colors duration-400 pt-24 sm:pt-32 pb-16 sm:pb-24">
@@ -82,7 +91,7 @@ export default async function TeamPage() {
         </div>
 
         <div className="space-y-12 sm:space-y-24 border border-[var(--border)] p-4 sm:p-8 mt-6 sm:mt-12 backdrop-blur-md mb-16 sm:mb-32" style={{ background: 'transparent' }}>
-          <TeamGrid gridCols={settings.studentGridCols} />
+          <TeamGrid gridCols={settings.studentGridCols} members={displayStudents} />
         </div>
 
         {/* Developers Section */}

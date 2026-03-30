@@ -11,6 +11,8 @@ export interface TeamMember {
   email?: string;
   quote?: string;
   affiliation?: string;
+  showOnHome?: boolean;
+  order?: number;
 }
 
 const FILE = "team.json";

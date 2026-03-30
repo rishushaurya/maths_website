@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Edit3, Save, X, Calendar, MapPin, Link2, Download, ChevronDown, ChevronUp, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit3, Save, X, Calendar, MapPin, Link2, Download, ChevronDown, ChevronUp, Eye, EyeOff, Loader2, ImageIcon } from "lucide-react";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 interface EventLink { label: string; url: string; }
 interface EventDownload { name: string; url: string; }
@@ -32,6 +33,7 @@ export default function EventsManager() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<EventData>>({});
   const [loading, setLoading] = useState(true);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   // Load from API
   useEffect(() => {
@@ -165,9 +167,23 @@ export default function EventsManager() {
       </div>
       <div>
         <label className="block text-[10px] tracking-[0.2em] uppercase mb-1" style={{ color: "var(--text-muted)" }}>Cover Image URL</label>
-        <input value={form.image || ""} onChange={(e) => setForm({ ...form, image: e.target.value })}
-          className="w-full px-3 py-2 text-sm font-mono border outline-none bg-transparent focus:border-[var(--accent)]"
-          style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} placeholder="https://..." />
+        <div className="flex items-center gap-2">
+            <input value={form.image || ""} onChange={(e) => setForm({ ...form, image: e.target.value })}
+            className="flex-1 px-3 py-2 text-sm font-mono border outline-none bg-transparent focus:border-[var(--accent)]"
+            style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} placeholder="https://..." />
+            <button 
+                type="button"
+                onClick={() => setShowMediaPicker(true)}
+                className="px-3 py-2 text-[10px] tracking-wider uppercase border whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                style={{ borderColor: "var(--border)", color: "var(--text-primary)", backgroundColor: "var(--bg-secondary)" }}>
+                <ImageIcon className="w-3 h-3" /> Browse Library
+            </button>
+        </div>
+        {form.image && (
+          <div className="mt-2 text-xs font-mono">
+            <img src={form.image} alt="Preview" className="w-32 h-16 object-cover border" style={{borderColor: "var(--border)"}}/>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-4" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-primary)" }}>
@@ -250,6 +266,13 @@ export default function EventsManager() {
 
   return (
     <div className="space-y-6">
+      <MediaPicker 
+        isOpen={showMediaPicker} 
+        onClose={() => setShowMediaPicker(false)} 
+        onSelect={(file) => { setForm({ ...form, image: file.url }); setShowMediaPicker(false); }}
+        typeFilter="image"
+      />
+
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-[0.2em] uppercase" style={{ color: "var(--text-primary)" }}>Events Manager</h1>

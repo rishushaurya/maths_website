@@ -8,9 +8,22 @@ import { MorphingCardStack } from "@/components/ui/morphing-card-stack";
 import { PromptingIsAllYouNeed } from "@/components/ui/animated-hero-section";
 import { TestimonialSlider, type Review } from "@/components/ui/testimonial-slider-1";
 import { Infinity, Divide, FunctionSquare, Variable, Hexagon, Activity, Network, Cpu } from "lucide-react";
-import { getHomeGallerySections, getHomeEvents, getAboutContent, getSettings, type GallerySection } from "@/lib/data";
+import { getHomeGallerySections, getHomeEvents, getAboutContent, getSettings, getFaculty, getStudents, type GallerySection } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+
+const fallbackFaculty = [
+  { name: "Dr. D. Hemachandra Sagar", role: "Chancellor, DSU", category: "faculty" as const, cardType: "faculty-card" as const, image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop", id: "f1" },
+  { name: "Dr. D. Premachandra Sagar", role: "Pro Chancellor, DSU", category: "faculty" as const, cardType: "faculty-card" as const, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop", id: "f2" },
+  { name: "Dr. A. N. Kolmogorov", role: "Professor & HOD", category: "faculty" as const, cardType: "faculty-card" as const, image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop", id: "f3" },
+];
+
+const fallbackStudents = [
+  { name: "Ramanujan Kumar", role: "Tech Lead", affiliation: "Algorithms & Competitive Programming", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop", id: "s1" },
+  { name: "Emmy Singh", role: "Design Lead", affiliation: "UI/UX & Interactive Media", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop", id: "s2" },
+  { name: "Alan Turing", role: "Event Coordinator", affiliation: "Logistics & Outreach", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop", id: "s3" },
+  { name: "Ada Lovelace", role: "Content Writer", affiliation: "Publications & Blogs", category: "student" as const, cardType: "avatar-hover" as const, image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop", id: "s4" },
+];
 
 const eventCards = [
   {
@@ -129,6 +142,16 @@ export default async function Home() {
   const dbEvents = await getHomeEvents();
   const dbAbout = await getAboutContent();
   const settings = await getSettings();
+  
+  const dbFaculty = await getFaculty();
+  const dbStudents = await getStudents();
+
+  const homeFaculty = dbFaculty.length > 0 ? dbFaculty.filter(m => m.showOnHome) : fallbackFaculty;
+  // If no faculty is set to show on home but db has faculty, just show them all. Otherwise fallback.
+  const displayFaculty = homeFaculty.length > 0 ? homeFaculty : (dbFaculty.length > 0 ? dbFaculty : fallbackFaculty);
+
+  const homeStudents = dbStudents.length > 0 ? dbStudents.filter(m => m.showOnHome) : fallbackStudents;
+  const displayStudents = homeStudents.length > 0 ? homeStudents : (dbStudents.length > 0 ? dbStudents.slice(0, 4) : fallbackStudents);
 
   const dynamicEventCards = dbEvents.length > 0 ? dbEvents.map((e) => ({
     id: e.id,
@@ -190,13 +213,13 @@ export default async function Home() {
             </div>
             
             <div className="w-full relative z-20 space-y-16 sm:space-y-32">
-              <FacultyGrid gridCols={settings.facultyGridCols} />
+              <FacultyGrid gridCols={settings.facultyGridCols} members={displayFaculty} />
               
               <div className="flex flex-col items-center">
                 <h3 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 tracking-widest uppercase border-b border-dotted pb-4" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
                   {settings.studentHeading}
                 </h3>
-                <TeamGrid gridCols={settings.studentGridCols} />
+                <TeamGrid gridCols={settings.studentGridCols} members={displayStudents} />
               </div>
             </div>
           </section>

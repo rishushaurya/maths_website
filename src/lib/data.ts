@@ -68,6 +68,8 @@ export interface TeamMember {
   email?: string;
   quote?: string;
   affiliation?: string;
+  showOnHome?: boolean;
+  order?: number;
 }
 
 export async function getTeamMembers(): Promise<TeamMember[]> {

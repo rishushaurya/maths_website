@@ -21,13 +21,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // If no hash is set yet, allow first-time setup with a default password
+    // Check credentials securely. No hardcoded default passwords allowed in production.
     let isValid = false;
-    if (!ADMIN_PASSWORD_HASH || ADMIN_PASSWORD_HASH === "$2a$12$placeholder_hash_here") {
-      // First-time: accept "admin123" as default, warn user to change it
-      isValid = password === "admin123";
-    } else {
+    const adminPasswordPlain = process.env.ADMIN_PASSWORD || process.env.VITE_ADMIN_PASSWORD;
+
+    if (ADMIN_PASSWORD_HASH && ADMIN_PASSWORD_HASH !== "$2a$12$placeholder_hash_here") {
       isValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    } else if (adminPasswordPlain) {
+      isValid = password === adminPasswordPlain;
+    } else {
+      // If neither hash nor plain text password is provided, lock down the system in production
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json({ error: "System lock: ADMIN_PASSWORD environment variable is not set." }, { status: 403 });
+      }
+      // For local dev only
+      isValid = password === "admin123";
     }
 
     if (!isValid) {

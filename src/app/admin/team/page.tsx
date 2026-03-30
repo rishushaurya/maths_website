@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Edit3, Save, X, Users, GraduationCap, Code, User, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit3, Save, X, Users, GraduationCap, Code, User, Loader2, ArrowUp, ArrowDown, ImageIcon, Home as HomeIcon } from "lucide-react";
+import { MediaPicker } from "@/components/admin/media-picker";
 
 type MemberCategory = "faculty" | "student" | "developer";
 type CardType = "faculty-card" | "avatar-hover" | "testimonial";
@@ -17,6 +18,7 @@ interface TeamMember {
   email?: string;
   quote?: string;
   affiliation?: string;
+  showOnHome?: boolean;
 }
 
 const categoryIcons = { faculty: GraduationCap, student: Users, developer: Code };
@@ -30,6 +32,8 @@ export default function TeamManager() {
   const [form, setForm] = useState<Partial<TeamMember>>({});
   const [filterCategory, setFilterCategory] = useState<MemberCategory | "all">("all");
   const [loading, setLoading] = useState(true);
+  
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/team").then((r) => r.json()).then((data) => {
@@ -55,7 +59,7 @@ export default function TeamManager() {
     setForm({
       name: "", role: "", category,
       cardType: category === "faculty" ? "faculty-card" : category === "developer" ? "testimonial" : "avatar-hover",
-      image: "", email: "", quote: "", affiliation: "",
+      image: "", email: "", quote: "", affiliation: "", showOnHome: false
     });
     setShowNew(true);
     setEditingId(null);
@@ -87,6 +91,34 @@ export default function TeamManager() {
 
   const cancel = () => { setShowNew(false); setEditingId(null); setForm({}); };
   const filtered = filterCategory === "all" ? members : members.filter((m) => m.category === filterCategory);
+
+  const moveUp = (memberId: string) => {
+    const allIdx = members.findIndex(m => m.id === memberId);
+    const filtIdx = filtered.findIndex(m => m.id === memberId);
+    if (filtIdx <= 0) return;
+    const targetId = filtered[filtIdx - 1].id;
+    const targetAllIdx = members.findIndex(m => m.id === targetId);
+    
+    const newMembers = [...members];
+    const temp = newMembers[allIdx];
+    newMembers[allIdx] = newMembers[targetAllIdx];
+    newMembers[targetAllIdx] = temp;
+    autoSave(newMembers);
+  };
+
+  const moveDown = (memberId: string) => {
+    const allIdx = members.findIndex(m => m.id === memberId);
+    const filtIdx = filtered.findIndex(m => m.id === memberId);
+    if (filtIdx >= filtered.length - 1) return;
+    const targetId = filtered[filtIdx + 1].id;
+    const targetAllIdx = members.findIndex(m => m.id === targetId);
+    
+    const newMembers = [...members];
+    const temp = newMembers[allIdx];
+    newMembers[allIdx] = newMembers[targetAllIdx];
+    newMembers[targetAllIdx] = temp;
+    autoSave(newMembers);
+  };
 
   const renderForm = () => (
     <motion.div className="p-5 border space-y-4" style={{ borderColor: "var(--accent)", backgroundColor: "var(--bg-surface)" }}
@@ -126,12 +158,41 @@ export default function TeamManager() {
           </select>
         </div>
       </div>
+      
       <div>
         <label className="block text-[10px] tracking-[0.2em] uppercase mb-1" style={{ color: "var(--text-muted)" }}>Profile Image URL</label>
-        <input value={form.image || ""} onChange={(e) => setForm({ ...form, image: e.target.value })}
-          className="w-full px-3 py-2 text-sm font-mono border outline-none bg-transparent focus:border-[var(--accent)]"
-          style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} placeholder="https://..." />
+        <div className="flex items-center gap-2">
+            <input value={form.image || ""} onChange={(e) => setForm({ ...form, image: e.target.value })}
+            className="flex-1 px-3 py-2 text-sm font-mono border outline-none bg-transparent focus:border-[var(--accent)]"
+            style={{ borderColor: "var(--border)", color: "var(--text-primary)" }} placeholder="https://..." />
+            <button 
+                type="button"
+                onClick={() => setShowMediaPicker(true)}
+                className="px-3 py-2 text-[10px] tracking-wider uppercase border whitespace-nowrap cursor-pointer flex items-center gap-1.5"
+                style={{ borderColor: "var(--border)", color: "var(--text-primary)", backgroundColor: "var(--bg-secondary)" }}>
+                <ImageIcon className="w-3 h-3" /> Browse Library
+            </button>
+        </div>
+        {form.image && (
+          <div className="mt-2 text-xs font-mono">
+            <img src={form.image} alt="Preview" className="w-16 h-16 object-cover border" style={{borderColor: "var(--border)"}}/>
+          </div>
+        )}
       </div>
+
+      <div className="flex items-center gap-2 mt-4 p-3 border border-dashed" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}>
+        <input 
+            type="checkbox" 
+            id="showOnHome" 
+            checked={!!form.showOnHome} 
+            onChange={(e) => setForm({ ...form, showOnHome: e.target.checked })}
+            className="w-4 h-4 cursor-pointer accent-[var(--accent)]"
+        />
+        <label htmlFor="showOnHome" className="text-sm font-mono cursor-pointer flex items-center gap-2 selection:bg-transparent" style={{ color: "var(--text-primary)" }}>
+            <HomeIcon className="w-4 h-4" /> Show this member on the Home Page
+        </label>
+      </div>
+
       {form.category === "faculty" && (
         <div>
           <label className="block text-[10px] tracking-[0.2em] uppercase mb-1" style={{ color: "var(--text-muted)" }}>Email</label>
@@ -171,6 +232,14 @@ export default function TeamManager() {
 
   return (
     <div className="space-y-6">
+      {/* Media Picker Overlay */}
+      <MediaPicker 
+        isOpen={showMediaPicker} 
+        onClose={() => setShowMediaPicker(false)} 
+        onSelect={(file) => { setForm({ ...form, image: file.url }); setShowMediaPicker(false); }}
+        typeFilter="image"
+      />
+
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-[0.2em] uppercase" style={{ color: "var(--text-primary)" }}>Team Manager</h1>
@@ -206,19 +275,32 @@ export default function TeamManager() {
       {filtered.length === 0 && !showNew && (
         <div className="border border-dashed p-12 text-center" style={{ borderColor: "var(--border)" }}>
           <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>No team members yet. Add your first member!</p>
-          <button onClick={() => startNew()} className="px-4 py-2 text-xs tracking-wider uppercase cursor-pointer"
-            style={{ backgroundColor: "var(--accent)", color: "var(--bg-primary)" }}><Plus className="w-4 h-4 inline mr-2" />Add Member</button>
         </div>
       )}
 
       <div className="space-y-2">
-        {filtered.map((member) => {
+        {filtered.map((member, index) => {
           const CatIcon = categoryIcons[member.category];
+          const isFirst = index === 0;
+          const isLast = index === filtered.length - 1;
+
           return (
             <div key={member.id}>
-              <div className="flex items-center justify-between px-4 py-3 border transition-colors"
-                style={{ borderColor: editingId === member.id ? "var(--accent)" : "var(--border)" }}>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between px-4 py-3 border transition-colors bg-opacity-50"
+                style={{ 
+                    borderColor: editingId === member.id ? "var(--accent)" : "var(--border)",
+                    backgroundColor: member.showOnHome ? "var(--bg-secondary)" : "transparent"
+                }}>
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-1 items-center px-2 border-r" style={{ borderColor: "var(--border)" }}>
+                     <button disabled={isFirst} onClick={() => moveUp(member.id)} className="p-1 disabled:opacity-30 cursor-pointer" style={{ color: "var(--text-muted)" }}>
+                        <ArrowUp className="w-3 h-3" />
+                     </button>
+                     <button disabled={isLast} onClick={() => moveDown(member.id)} className="p-1 disabled:opacity-30 cursor-pointer" style={{ color: "var(--text-muted)" }}>
+                        <ArrowDown className="w-3 h-3" />
+                     </button>
+                  </div>
+
                   <div className="w-10 h-10 rounded-full overflow-hidden border shrink-0" style={{ borderColor: "var(--border)" }}>
                     {member.image ? <img src={member.image} alt="" className="w-full h-full object-cover" /> :
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "var(--bg-secondary)" }}>
@@ -226,7 +308,14 @@ export default function TeamManager() {
                       </div>}
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold tracking-wider" style={{ color: "var(--text-primary)" }}>{member.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold tracking-wider" style={{ color: "var(--text-primary)" }}>{member.name}</h3>
+                      {member.showOnHome && (
+                         <span title="Visible on Home Page" className="px-1.5 py-0.5 text-[8px] uppercase font-bold tracking-widest border" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+                            Home
+                         </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-[10px]" style={{ color: "var(--text-muted)" }}>
                       <CatIcon className="w-3 h-3" /><span className="uppercase tracking-wider">{categoryLabels[member.category]}</span><span>·</span><span>{member.role}</span>
                     </div>
