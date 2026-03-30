@@ -78,7 +78,7 @@ export const TestimonialSlider = ({
   return (
     <div
       className={cn(
-        "relative w-full min-h-[650px] md:min-h-[600px] overflow-hidden p-8 md:p-12",
+        "relative w-full min-h-[500px] sm:min-h-[600px] md:min-h-[600px] overflow-hidden p-4 sm:p-8 md:p-12",
         className
       )}
       style={{
@@ -126,7 +126,7 @@ export const TestimonialSlider = ({
         </div>
 
         {/* === Center Column: Main Image === */}
-        <div className="md:col-span-4 relative h-80 min-h-[400px] md:min-h-[500px] order-1 md:order-2">
+        <div className="md:col-span-4 relative h-64 sm:h-80 min-h-[300px] sm:min-h-[400px] md:min-h-[500px] order-1 md:order-2">
           <AnimatePresence initial={false} custom={direction}>
             <motion.img
               key={currentIndex}
@@ -163,7 +163,7 @@ export const TestimonialSlider = ({
                 <h3 className="text-2xl font-bold mt-2 uppercase tracking-wide">
                   {activeReview.name}
                 </h3>
-                <blockquote className="mt-8 text-xl md:text-2xl font-mono leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                <blockquote className="mt-4 sm:mt-8 text-base sm:text-xl md:text-2xl font-mono leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   "{activeReview.quote}"
                 </blockquote>
               </motion.div>

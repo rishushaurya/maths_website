@@ -50,10 +50,8 @@ export function MorphingCardStack({
     const swipe = Math.abs(offset.x) * velocity.x
 
     if (offset.x < -SWIPE_THRESHOLD || swipe < -1000) {
-      // Swiped left - go to next card
       setActiveIndex((prev) => (prev + 1) % cards.length)
     } else if (offset.x > SWIPE_THRESHOLD || swipe > 1000) {
-      // Swiped right - go to previous card
       setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length)
     }
     setIsDragging(false)
@@ -65,7 +63,7 @@ export function MorphingCardStack({
       const index = (activeIndex + i) % cards.length
       reordered.push({ ...cards[index], stackPosition: i })
     }
-    return reordered.reverse() // Reverse so top card renders last (on top)
+    return reordered.reverse()
   }
 
   const getLayoutStyles = (stackPosition: number) => {
@@ -78,34 +76,23 @@ export function MorphingCardStack({
           rotate: (stackPosition - 1) * 2,
         }
       case "grid":
-        return {
-          top: 0,
-          left: 0,
-          zIndex: 1,
-          rotate: 0,
-        }
       case "list":
-        return {
-          top: 0,
-          left: 0,
-          zIndex: 1,
-          rotate: 0,
-        }
+        return { top: 0, left: 0, zIndex: 1, rotate: 0 }
     }
   }
 
   const containerStyles = {
-    stack: "relative h-64 w-64 md:h-72 md:w-80",
-    grid: "grid grid-cols-2 gap-4",
-    list: "flex flex-col gap-4 w-full max-w-2xl",
+    stack: "relative h-56 w-full max-w-[280px] sm:h-72 sm:w-80",
+    grid: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4",
+    list: "flex flex-col gap-3 sm:gap-4 w-full max-w-2xl",
   }
 
   const displayCards = layout === "stack" ? getStackOrder() : cards.map((c, i) => ({ ...c, stackPosition: i }))
 
   return (
-    <div className={cn("space-y-8", className)}>
-      {/* Layout Toggle - Brutalist Styling */}
-      <div className="flex items-center justify-center gap-2 p-1 w-fit mx-auto" style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+    <div className={cn("space-y-6 sm:space-y-8", className)}>
+      {/* Layout Toggle */}
+      <div className="flex items-center justify-center gap-1 sm:gap-2 p-1 w-fit mx-auto" style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
         {(Object.keys(layoutIcons) as LayoutMode[]).map((mode) => {
           const Icon = layoutIcons[mode]
           return (
@@ -113,10 +100,8 @@ export function MorphingCardStack({
               key={mode}
               onClick={() => setLayout(mode)}
               className={cn(
-                "p-2 transition-all font-mono uppercase text-xs tracking-widest",
-                layout === mode
-                  ? "font-bold"
-                  : "hover:opacity-100",
+                "p-1.5 sm:p-2 transition-all font-mono uppercase text-xs tracking-widest",
+                layout === mode ? "font-bold" : "hover:opacity-100",
               )}
               style={{
                 background: layout === mode ? 'var(--accent)' : 'transparent',
@@ -124,7 +109,7 @@ export function MorphingCardStack({
               }}
               aria-label={`Switch to ${mode} layout`}
             >
-              <Icon className="h-5 w-5" strokeWidth={1.5} />
+              <Icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
             </button>
           )
         })}
@@ -146,16 +131,12 @@ export function MorphingCardStack({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{
                     opacity: 1,
-                    scale: isExpanded ? 1.05 : 1,
+                    scale: isExpanded ? 1.02 : 1,
                     x: 0,
                     ...styles,
                   }}
                   exit={{ opacity: 0, scale: 0.8, x: -200 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   drag={isTopCard ? "x" : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.7}
@@ -168,10 +149,10 @@ export function MorphingCardStack({
                     onCardClick?.(card)
                   }}
                   className={cn(
-                    "cursor-pointer p-5 transition-colors backdrop-blur-sm",
-                    layout === "stack" && "absolute w-64 h-56 md:w-80 md:h-64",
+                    "cursor-pointer p-4 sm:p-5 transition-colors backdrop-blur-sm",
+                    layout === "stack" && "absolute w-full h-full max-w-[280px] sm:w-80 sm:h-64",
                     layout === "stack" && isTopCard && "cursor-grab active:cursor-grabbing",
-                    layout === "grid" && "w-full aspect-square md:aspect-auto md:h-64 flex flex-col justify-between",
+                    layout === "grid" && "w-full min-h-[180px] sm:min-h-[200px] flex flex-col justify-between",
                     layout === "list" && "w-full flex-row items-center",
                   )}
                   style={{
@@ -181,36 +162,32 @@ export function MorphingCardStack({
                   }}
                 >
                   <div className={cn(
-                    "flex gap-4 h-full",
+                    "flex gap-3 sm:gap-4 h-full",
                     layout === "grid" ? "flex-col" : "flex-row items-start"
                   )}>
                     {card.icon && (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-transparent" style={{ border: '1px solid var(--border-hover)', color: 'var(--accent)' }}>
+                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center bg-transparent" style={{ border: '1px solid var(--border-hover)', color: 'var(--accent)' }}>
                         {card.icon}
                       </div>
                     )}
                     <div className="min-w-0 flex-1 flex flex-col justify-center">
-                      <h3 className="font-bold font-mono text-lg md:text-xl tracking-widest uppercase truncate border-b border-dotted pb-2 mb-2" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+                      <h3 className="font-bold font-mono text-base sm:text-lg md:text-xl tracking-widest uppercase truncate border-b border-dotted pb-2 mb-2" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
                         {card.title}
                       </h3>
-                      <p
-                        className={cn(
-                          "text-sm font-mono normal-case tracking-normal leading-relaxed",
-                          layout === "stack" && "line-clamp-4",
-                          layout === "grid" && "line-clamp-3",
-                          layout === "list" && "line-clamp-2",
-                        )}
-                      >
-                        <span style={{ color: 'var(--text-secondary)' }}>
-                        {card.description}
-                        </span>
+                      <p className={cn(
+                        "text-xs sm:text-sm font-mono normal-case tracking-normal leading-relaxed",
+                        layout === "stack" && "line-clamp-3 sm:line-clamp-4",
+                        layout === "grid" && "line-clamp-3",
+                        layout === "list" && "line-clamp-2",
+                      )}>
+                        <span style={{ color: 'var(--text-secondary)' }}>{card.description}</span>
                       </p>
                     </div>
                   </div>
 
                   {isTopCard && (
-                    <div className="absolute bottom-3 left-0 right-0 text-center">
-                      <span className="text-xs font-mono tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
+                    <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 text-center">
+                      <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
                         &lt; SWIPE TO NAVIGATE &gt;
                       </span>
                     </div>
@@ -222,17 +199,14 @@ export function MorphingCardStack({
         </motion.div>
       </LayoutGroup>
 
-      {/* Pagination indicators */}
+      {/* Pagination */}
       {layout === "stack" && cards.length > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
+        <div className="flex justify-center gap-2 mt-6 sm:mt-8">
           {cards.map((_, index) => (
             <button
               key={index}
               onClick={() => setActiveIndex(index)}
-              className={cn(
-                "h-1 transition-all rounded-none",
-                index === activeIndex ? "w-8" : "w-2",
-              )}
+              className={cn("h-1 transition-all rounded-none", index === activeIndex ? "w-6 sm:w-8" : "w-2")}
               style={{ background: index === activeIndex ? 'var(--accent)' : 'var(--border)' }}
               aria-label={`Go to card ${index + 1}`}
             />

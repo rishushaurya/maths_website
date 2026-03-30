@@ -30,13 +30,13 @@ const brahmaguptaCards = [
 
 export default function AboutPage() {
   return (
-    <main className="relative min-h-screen font-mono antialiased overflow-x-hidden uppercase tracking-wider transition-colors duration-400 pt-32 pb-24">
+    <main className="relative min-h-screen font-mono antialiased overflow-x-hidden uppercase tracking-wider transition-colors duration-400 pt-24 sm:pt-32 pb-16 sm:pb-24">
       <div className="relative z-10 max-w-5xl mx-auto px-4">
-        <div className="text-center mb-16 relative z-20">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+        <div className="text-center mb-8 sm:mb-16 relative z-20">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
             BRAHMAGUPTA MATHEMATICS CLUB
           </h1>
-          <div className="text-lg leading-relaxed space-y-6 font-mono normal-case tracking-normal max-w-4xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+          <div className="text-sm sm:text-base md:text-lg leading-relaxed space-y-4 sm:space-y-6 font-mono normal-case tracking-normal max-w-4xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
             <p>
               Established by the Department of Mathematics, Dayananda Sagar School of Engineering (DSU), serving as a bridge between young engineering minds and advanced research in mathematics and Artificial Intelligence.
             </p>

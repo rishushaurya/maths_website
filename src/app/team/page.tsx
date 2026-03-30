@@ -65,31 +65,31 @@ export default function TeamPage() {
   const settings = getSettings();
   
   return (
-    <main className="relative min-h-screen font-mono antialiased overflow-x-hidden transition-colors duration-400 pt-32 pb-24">
+    <main className="relative min-h-screen font-mono antialiased overflow-x-hidden transition-colors duration-400 pt-24 sm:pt-32 pb-16 sm:pb-24">
       <div className="relative z-10 container mx-auto px-4 lg:px-12">
         
         {/* Teams Section */}
-        <div className="mb-16 md:mb-24 flex flex-col items-center justify-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-widest text-center" style={{ color: 'var(--text-primary)' }}>
+        <div className="mb-8 sm:mb-16 md:mb-24 flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-widest text-center" style={{ color: 'var(--text-primary)' }}>
             {settings.studentHeading}
           </h1>
-          <div className="h-1 w-24 rounded" style={{ background: 'var(--accent)' }} />
-          <p className="max-w-2xl text-center text-sm md:text-base opacity-80" style={{ color: 'var(--text-secondary)' }}>
+          <div className="h-1 w-16 sm:w-24 rounded" style={{ background: 'var(--accent)' }} />
+          <p className="max-w-2xl text-center text-xs sm:text-sm md:text-base opacity-80 px-2" style={{ color: 'var(--text-secondary)' }}>
             Visionaries modeling the abstract universe of logic to drive the concrete engineering breakthroughs of tomorrow.
           </p>
         </div>
 
-        <div className="space-y-24 border border-[var(--border)] p-8 mt-12 backdrop-blur-md mb-32" style={{ background: 'transparent' }}>
+        <div className="space-y-12 sm:space-y-24 border border-[var(--border)] p-4 sm:p-8 mt-6 sm:mt-12 backdrop-blur-md mb-16 sm:mb-32" style={{ background: 'transparent' }}>
           <TeamGrid gridCols={settings.studentGridCols} />
         </div>
 
         {/* Developers Section */}
-        <section id="devs" className="flex flex-col items-center justify-center border-t border-dotted pt-32" style={{ borderColor: 'var(--border)' }}>
-          <div className="max-w-4xl mx-auto text-center mb-16 relative z-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+        <section id="devs" className="flex flex-col items-center justify-center border-t border-dotted pt-16 sm:pt-32" style={{ borderColor: 'var(--border)' }}>
+          <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
               {settings.developerHeading}
             </h2>
-            <p className="text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-sm sm:text-base md:text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               The architects and engineers behind the interactive ecosystem of this platform.
             </p>
           </div>

@@ -27,13 +27,17 @@ export const AnimatedTabs = ({
 
   return (
     <div className={cn("w-full flex flex-col gap-y-4", className)}>
-      <div className="flex gap-2 flex-wrap items-center justify-center p-1 w-fit mx-auto" style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+      {/* Tab bar — scrollable on mobile */}
+      <div 
+        className="flex gap-1 sm:gap-2 items-center justify-start sm:justify-center p-1 w-full sm:w-fit mx-auto overflow-x-auto no-scrollbar"
+        style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "relative px-4 py-2 text-sm font-mono uppercase tracking-widest outline-none transition-all cursor-pointer",
+              "relative px-3 sm:px-4 py-2 text-xs sm:text-sm font-mono uppercase tracking-widest outline-none transition-all cursor-pointer whitespace-nowrap shrink-0",
             )}
             style={{
               color: activeTab === tab.id ? 'var(--bg-primary)' : 'var(--text-muted)'
@@ -55,23 +59,16 @@ export const AnimatedTabs = ({
         ))}
       </div>
 
-      <div className="w-full mt-4 min-h-[400px]">
+      <div className="w-full mt-2 sm:mt-4 min-h-[300px] sm:min-h-[400px]">
         {tabs.map(
           (tab) =>
             activeTab === tab.id && (
               <motion.div
                 key={tab.id}
-                initial={{
-                  opacity: 0,
-                  y: 10,
-                  filter: "blur(4px)",
-                }}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                transition={{
-                  duration: 0.4,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="h-full"
               >
                 {tab.content}

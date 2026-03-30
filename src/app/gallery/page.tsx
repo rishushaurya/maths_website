@@ -47,9 +47,9 @@ export default function GalleryPage() {
 
   return (
     <main className="relative min-h-screen font-mono antialiased overflow-x-hidden uppercase tracking-wider transition-colors duration-400">
-      <div className="relative z-10 flex flex-col min-h-screen items-center justify-center pt-32 pb-16 px-4">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-widest drop-shadow-lg mb-16" style={{ color: 'var(--accent)' }}>GALLERY</h1>
-        <div className="w-full relative z-20 space-y-16">
+      <div className="relative z-10 flex flex-col min-h-screen items-center justify-center pt-24 sm:pt-32 pb-12 sm:pb-16 px-4">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-widest drop-shadow-lg mb-8 sm:mb-16" style={{ color: 'var(--accent)' }}>GALLERY</h1>
+        <div className="w-full relative z-20 space-y-8 sm:space-y-16">
           {hasDBData ? (
             dbSections.map((section) => (
               <ImageAutoSlider key={section.id} eventName={section.name} items={sectionToMediaItems(section)} />

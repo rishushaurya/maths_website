@@ -35,7 +35,7 @@ export default function EventsPage() {
     label: event.title,
     content: (
       <div 
-        className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full h-full p-6 md:p-8 relative backdrop-blur-sm"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full h-full p-4 sm:p-6 md:p-8 relative backdrop-blur-sm"
         style={{ border: '1px solid var(--border)', backgroundColor: 'var(--card-bg)' }}
       >
         <div className="w-full h-64 md:h-full relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
@@ -58,7 +58,7 @@ export default function EventsPage() {
         </div>
 
         <div className="flex flex-col gap-y-4 justify-center">
-          <h2 className="text-3xl font-bold font-mono tracking-widest uppercase border-b border-dotted pb-4" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+          <h2 className="text-xl sm:text-3xl font-bold font-mono tracking-widest uppercase border-b border-dotted pb-3 sm:pb-4" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
             {event.title}
           </h2>
           
@@ -81,7 +81,7 @@ export default function EventsPage() {
             )}
           </div>
 
-          <div className="flex flex-wrap gap-4 mt-8">
+          <div className="flex flex-wrap gap-2 sm:gap-4 mt-4 sm:mt-8">
             {event.links.map((link, i) => (
                <a key={i} href={link.url} target="_blank" rel="noreferrer"
                 className="flex items-center gap-2 px-4 py-2 font-mono text-xs tracking-widest uppercase transition-colors hover:bg-white/10"
@@ -108,7 +108,7 @@ export default function EventsPage() {
   const ended = eventPageEvents.filter(e => e.status === "ended");
 
   const SectionLine = ({ label }: { label: string }) => (
-    <div className="w-full flex items-center justify-center py-16">
+    <div className="w-full flex items-center justify-center py-8 sm:py-16">
        <div className="w-full h-px border-t border-dotted flex-1" style={{ borderColor: 'var(--border)' }} />
        <div className="px-6 text-sm font-bold tracking-[0.3em] uppercase" style={{ color: 'var(--text-secondary)' }}>{label}</div>
        <div className="w-full h-px border-t border-dotted flex-1" style={{ borderColor: 'var(--border)' }} />
@@ -117,14 +117,14 @@ export default function EventsPage() {
 
   return (
     <main className="relative min-h-screen font-mono antialiased overflow-x-hidden transition-colors duration-400">
-      <div className="relative z-10 flex flex-col min-h-screen items-center justify-start pt-32 pb-16 px-4">
+      <div className="relative z-10 flex flex-col min-h-screen items-center justify-start pt-24 sm:pt-32 pb-12 sm:pb-16 px-4">
         
         {/* Header Section */}
-        <div className="w-full max-w-6xl mx-auto flex flex-col items-center mb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-widest drop-shadow-lg mb-4 uppercase text-center" style={{ color: 'var(--accent)' }}>
+        <div className="w-full max-w-6xl mx-auto flex flex-col items-center mb-8 sm:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold tracking-widest drop-shadow-lg mb-3 sm:mb-4 uppercase text-center" style={{ color: 'var(--accent)' }}>
             <span className="opacity-50">&gt;_ </span>EVENTS
           </h1>
-          <p className="text-center max-w-2xl text-sm font-mono tracking-widest uppercase mb-12" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-center max-w-2xl text-xs sm:text-sm font-mono tracking-widest uppercase mb-6 sm:mb-12 px-2" style={{ color: 'var(--text-muted)' }}>
             [System Log] Directory of all mathematical challenges, symposiums, and research workshops.
           </p>
           

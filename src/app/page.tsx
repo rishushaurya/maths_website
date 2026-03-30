@@ -71,60 +71,44 @@ const devTeamReviews: Review[] = [
     id: 1,
     name: "Ashley Right",
     affiliation: "Pinterest",
-    quote:
-      "Professionals in their craft! All products were super amazing with strong attention to details, comps and overall vibe.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop&q=80",
-    thumbnailSrc:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=120&fit=crop&q=80",
+    quote: "Professionals in their craft! All products were super amazing with strong attention to details, comps and overall vibe.",
+    imageSrc: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop&q=80",
+    thumbnailSrc: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=120&fit=crop&q=80",
   },
   {
     id: 2,
     name: "Jacob Jose",
     affiliation: "New York Times",
-    quote:
-      "Unlimited, instant access to hundreds of premium quality resources created by designers for designers.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&q=80",
-    thumbnailSrc:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=120&fit=crop&q=80",
+    quote: "Unlimited, instant access to hundreds of premium quality resources created by designers for designers.",
+    imageSrc: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&q=80",
+    thumbnailSrc: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=120&fit=crop&q=80",
   },
   {
     id: 3,
     name: "Elara Sands",
     affiliation: "Behance",
-    quote:
-      "The attention to detail is immaculate. Every component feels polished and ready for production.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop&q=80",
-    thumbnailSrc:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=120&fit=crop&q=80",
+    quote: "The attention to detail is immaculate. Every component feels polished and ready for production.",
+    imageSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop&q=80",
+    thumbnailSrc: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=120&fit=crop&q=80",
   },
   {
     id: 4,
     name: "Marcus Cole",
     affiliation: "Dribbble",
-    quote:
-      "A true time-saver. I can focus on my core logic instead of pixel-pushing. Highly recommended.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop&q=80",
-    thumbnailSrc:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=120&fit=crop&q=80",
+    quote: "A true time-saver. I can focus on my core logic instead of pixel-pushing. Highly recommended.",
+    imageSrc: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop&q=80",
+    thumbnailSrc: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=120&fit=crop&q=80",
   },
   {
     id: 5,
     name: "Serena V.",
     affiliation: "Figma",
-    quote:
-      "This is the design system I've been waiting for. It's flexible, accessible, and beautiful.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&q=80",
-    thumbnailSrc:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=120&fit=crop&q=80",
+    quote: "This is the design system I've been waiting for. It's flexible, accessible, and beautiful.",
+    imageSrc: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&q=80",
+    thumbnailSrc: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=120&fit=crop&q=80",
   },
 ];
 
-// Sample Media Data for Gallery Event Auto-Sliders
 const hackathonMedia: MediaItem[] = [
   { id: 'hk-1', type: 'image', src: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=600&auto=format&fit=crop' },
   { id: 'hk-2', type: 'image', src: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?q=80&w=600&auto=format&fit=crop' },
@@ -141,13 +125,11 @@ const lectureMedia: MediaItem[] = [
 ];
 
 export default function Home() {
-  // Load admin-managed data (falls back to hardcoded if empty)
   const dbGallery = getHomeGallerySections();
   const dbEvents = getHomeEvents();
   const dbAbout = getAboutContent();
   const settings = getSettings();
 
-  // Build dynamic event cards from admin data
   const dynamicEventCards = dbEvents.length > 0 ? dbEvents.map((e) => ({
     id: e.id,
     title: e.title,
@@ -155,22 +137,17 @@ export default function Home() {
     icon: <Infinity className="h-6 w-6" />,
   })) : eventCards;
 
-  // Dynamic gallery media from admin data
   const dynamicGallery: { name: string; items: MediaItem[] }[] = dbGallery.length > 0
     ? dbGallery.map((s: GallerySection) => ({ name: s.name, items: s.items.map((i) => ({ id: i.id, type: i.type, src: i.url })) }))
     : [{ name: "Topology Hackathon", items: hackathonMedia }, { name: "Non-Linear Dynamics Lecture", items: lectureMedia }];
 
-  // Dynamic about content
   const aboutParagraphs = dbAbout && dbAbout.paragraphs.length > 0 ? dbAbout.paragraphs : null;
-
-  // Find the event marked for countdown
   const countdownEvent = dbEvents.find(e => e.isCountdownEvent);
 
   return (
     <main className="relative min-h-screen font-mono antialiased overflow-x-hidden uppercase tracking-wider transition-colors duration-400"
       style={{ color: 'var(--text-primary)' }}
     >
-      {/* Main Foreground Content */}
       <div className="relative z-10">
         
         {/* Full-screen Hero */}
@@ -178,23 +155,20 @@ export default function Home() {
           <HeroAsciiOne />
         </section>
 
-        {/* Scrollable Content Sections */}
         <div className="bg-transparent flex flex-col">
 
-
-
           {/* EVENTS SECTION */}
-          <section id="events" className="min-h-screen py-32 px-4 flex flex-col items-center justify-center">
+          <section id="events" className="min-h-screen py-16 sm:py-32 px-4 flex flex-col items-center justify-center">
             
             {countdownEvent && (
-              <div className="w-full max-w-5xl mx-auto relative z-20 mb-24">
+              <div className="w-full max-w-5xl mx-auto relative z-20 mb-12 sm:mb-24">
                 <EventCountdown event={countdownEvent} />
               </div>
             )}
 
-            <div className="max-w-4xl mx-auto text-center mb-16 relative z-20">
-              <h2 className="text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>UPCOMING EVENTS</h2>
-              <p className="text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+            <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+              <h2 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>UPCOMING EVENTS</h2>
+              <p className="text-sm sm:text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                 Symposiums, hackathons, and guest lectures designed to push your analytical boundaries.
               </p>
             </div>
@@ -205,21 +179,21 @@ export default function Home() {
           </section>
 
           {/* TEAM SECTION */}
-          <section id="team" className="min-h-screen py-32 px-4 flex flex-col items-center justify-center">
-            <div className="max-w-4xl mx-auto text-center mb-16 relative z-20">
-              <h2 className="text-5xl font-bold mb-8 tracking-widest uppercase" style={{ color: 'var(--text-primary)' }}>
+          <section id="team" className="min-h-screen py-16 sm:py-32 px-4 flex flex-col items-center justify-center">
+            <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+              <h2 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase" style={{ color: 'var(--text-primary)' }}>
                 {settings.facultyHeading}
               </h2>
-              <p className="text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm sm:text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                 Meet the visionary educators and researchers mentoring the next generation of engineers.
               </p>
             </div>
             
-            <div className="w-full relative z-20 space-y-32">
+            <div className="w-full relative z-20 space-y-16 sm:space-y-32">
               <FacultyGrid gridCols={settings.facultyGridCols} />
               
               <div className="flex flex-col items-center">
-                <h3 className="text-4xl font-bold mb-12 tracking-widest uppercase border-b border-dotted pb-4" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+                <h3 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 tracking-widest uppercase border-b border-dotted pb-4" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
                   {settings.studentHeading}
                 </h3>
                 <TeamGrid gridCols={settings.studentGridCols} />
@@ -228,15 +202,15 @@ export default function Home() {
           </section>
 
           {/* GALLERY SECTION */}
-          <section id="gallery" className="min-h-screen py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
-            <div className="max-w-4xl mx-auto text-center mb-16 relative z-20">
-              <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>GALLERY</h2>
-              <p className="text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-                A visual journey through our department's greatest moments, symposiums, and breakthroughs.
+          <section id="gallery" className="min-h-screen py-16 sm:py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
+            <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>GALLERY</h2>
+              <p className="text-sm sm:text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                A visual journey through our department&apos;s greatest moments, symposiums, and breakthroughs.
               </p>
             </div>
             
-            <div className="w-full relative z-20 space-y-8">
+            <div className="w-full relative z-20 space-y-6 sm:space-y-8">
               {dynamicGallery.map((g, i) => (
                 <ImageAutoSlider key={i} eventName={g.name} items={g.items} />
               ))}
@@ -244,34 +218,32 @@ export default function Home() {
           </section>
 
           {/* DEVS SECTION */}
-          <section id="devs" className="min-h-screen py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
-            <div className="max-w-4xl mx-auto text-center mb-16 relative z-20">
-              <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+          <section id="devs" className="min-h-screen py-16 sm:py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
+            <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
                 {settings.developerHeading}
               </h2>
-              <p className="text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm sm:text-xl font-mono normal-case tracking-normal max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                 The architects and engineers behind the interactive ecosystem of this platform.
               </p>
             </div>
             
-            {/* Animated Canvas Hero for Devs */}
-            <div className="w-full relative z-20 mb-16">
+            <div className="w-full relative z-20 mb-8 sm:mb-16">
               <PromptingIsAllYouNeed />
             </div>
 
-            {/* Dev Team Testimonial Slider */}
             <div className="w-full relative z-20">
               <TestimonialSlider reviews={devTeamReviews} />
             </div>
           </section>
 
-          {/* ABOUT SECTION (AS FOOTER) */}
-          <section id="about" className="min-h-screen py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
-            <div className="max-w-5xl mx-auto text-center mb-16 relative z-20">
-              <h2 className="text-4xl md:text-5xl font-bold mb-8 tracking-widest uppercase border-b border-dotted pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
+          {/* ABOUT SECTION */}
+          <section id="about" className="min-h-screen py-16 sm:py-32 px-4 flex flex-col items-center justify-center border-t border-dotted" style={{ borderColor: 'var(--border)' }}>
+            <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16 relative z-20">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-8 tracking-widest uppercase border-b border-dotted pb-4 sm:pb-6 inline-block" style={{ color: 'var(--text-primary)', borderColor: 'var(--border)' }}>
                 BRAHMAGUPTA MATHEMATICS CLUB
               </h2>
-              <div className="text-lg leading-relaxed space-y-6 font-mono normal-case tracking-normal max-w-4xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              <div className="text-sm sm:text-lg leading-relaxed space-y-4 sm:space-y-6 font-mono normal-case tracking-normal max-w-4xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
                 {aboutParagraphs ? (
                   aboutParagraphs.map((p, i) => <p key={i}>{p}</p>)
                 ) : (

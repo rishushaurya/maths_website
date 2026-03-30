@@ -54,3 +54,19 @@ body {
   background: var(--accent);
   color: var(--bg-primary);
 }
+
+/* Hide scrollbar for horizontal scroll areas on mobile */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile safe area padding */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

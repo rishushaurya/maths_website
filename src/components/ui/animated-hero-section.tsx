@@ -483,7 +483,7 @@ export function PromptingIsAllYouNeed() {
   }, [])
 
   return (
-    <div className="relative w-full h-[600px] flex items-center justify-center overflow-hidden bg-transparent border-t border-b border-dotted" style={{ borderColor: 'var(--border)' }}>
+    <div className="relative w-full h-[350px] sm:h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden bg-transparent border-t border-b border-dotted" style={{ borderColor: 'var(--border)' }}>
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0 w-full h-full opacity-50 pointer-events-none z-0"

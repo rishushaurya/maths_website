@@ -30,12 +30,12 @@ export const ImageAutoSlider = ({ items, eventName }: ImageAutoSliderProps) => {
   const duplicatedItems = [...items, ...items, ...items];
 
   return (
-    <div className="w-full relative py-12 flex flex-col items-start justify-center border-b border-dashed border-[var(--border)]">
+    <div className="w-full relative py-6 sm:py-12 flex flex-col items-start justify-center border-b border-dashed border-[var(--border)]">
       
       {/* Event Header */}
-      <div className="w-full max-w-7xl mx-auto px-4 mb-8">
-        <h3 className="text-2xl md:text-3xl font-mono uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>
-          <span className="text-[var(--accent)] mr-3">&gt;_</span>{eventName}
+      <div className="w-full max-w-7xl mx-auto px-4 mb-4 sm:mb-8">
+        <h3 className="text-lg sm:text-2xl md:text-3xl font-mono uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-[var(--accent)] mr-2 sm:mr-3">&gt;_</span>{eventName}
         </h3>
       </div>
 
@@ -73,7 +73,7 @@ export const ImageAutoSlider = ({ items, eventName }: ImageAutoSliderProps) => {
               <div
                 key={`${item.id}-${index}`}
                 onClick={() => setSelectedMedia(item)}
-                className="group relative flex-shrink-0 w-64 h-48 md:w-80 md:h-56 cursor-pointer overflow-hidden border border-[var(--border)] transition-all duration-300 hover:border-[var(--accent)]"
+                className="group relative flex-shrink-0 w-48 h-36 sm:w-64 sm:h-48 md:w-80 md:h-56 cursor-pointer overflow-hidden border border-[var(--border)] transition-all duration-300 hover:border-[var(--accent)]"
                 style={{ backgroundColor: 'var(--bg-secondary)' }}
               >
                 {item.type === 'video' ? (
